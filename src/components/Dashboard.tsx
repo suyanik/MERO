@@ -344,7 +344,7 @@ export default function Dashboard({ mitarbeiter, onNavigate }: DashboardProps) {
               <XAxis dataKey="name" tick={{ fill: '#64748b', fontSize: 12 }} />
               <YAxis tick={{ fill: '#64748b', fontSize: 12 }} tickFormatter={(value) => `${value.toLocaleString('de-DE')}€`} />
               <Tooltip
-                formatter={(value: number) => `${value.toLocaleString('de-DE')} €`}
+                formatter={(value) => `${Number(value).toLocaleString('de-DE')} €`}
                 contentStyle={{
                   backgroundColor: '#1e293b',
                   border: 'none',
