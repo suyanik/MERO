@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabase'
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts'
 import { Mitarbeiter, Zahlung, Dokument, Urlaub } from '@/types/database'
 import {
   Users,
@@ -30,6 +31,7 @@ export default function Dashboard({ mitarbeiter, onNavigate }: DashboardProps) {
   const [zahlungen, setZahlungen] = useState<Zahlung[]>([])
   const [dokumente, setDokumente] = useState<Dokument[]>([])
   const [urlaube, setUrlaube] = useState<Urlaub[]>([])
+  const [jahresZahlungen, setJahresZahlungen] = useState<Zahlung[]>([])
   const [loading, setLoading] = useState(true)
 
   const currentMonth = `${new Date().getFullYear()}-${String(new Date().getMonth() + 1).padStart(2, '0')}`
@@ -63,6 +65,15 @@ export default function Dashboard({ mitarbeiter, onNavigate }: DashboardProps) {
     setZahlungen(zahlungenData || [])
     setDokumente(dokumenteData || [])
     setUrlaube(urlaubData || [])
+
+    // Tüm yıl zahlungen (grafik için)
+    const { data: jahresData } = await supabase
+      .from('zahlungen')
+      .select('*')
+      .gte('zahlungsdatum', `${new Date().getFullYear()}-01-01`)
+      .lte('zahlungsdatum', `${new Date().getFullYear()}-12-31`)
+
+    setJahresZahlungen(jahresData || [])
     setLoading(false)
   }
 
@@ -100,6 +111,30 @@ export default function Dashboard({ mitarbeiter, onNavigate }: DashboardProps) {
     .filter(z => z.zahlungsart === 'bonus')
     .reduce((sum, z) => sum + z.betrag, 0)
   const totalAuszahlung = totalGehalt - totalVorschuss + totalBonus
+
+  // Aylık grafik verisi
+  const chartData = Array.from({ length: 12 }, (_, i) => {
+    const month = String(i + 1).padStart(2, '0')
+    const monthKey = `${new Date().getFullYear()}-${month}`
+
+    const monthZahlungen = jahresZahlungen.filter(z => z.zahlungsmonat === monthKey)
+    const vorschuss = monthZahlungen
+      .filter(z => z.zahlungsart === 'vorschuss')
+      .reduce((sum, z) => sum + z.betrag, 0)
+    const bonus = monthZahlungen
+      .filter(z => z.zahlungsart === 'bonus')
+      .reduce((sum, z) => sum + z.betrag, 0)
+
+    const grundgehalt = aktiveMitarbeiter.reduce((sum, m) => sum + m.grundgehalt, 0)
+
+    return {
+      name: new Date(2024, i).toLocaleDateString('de-DE', { month: 'short' }),
+      Gehalt: grundgehalt,
+      Vorschuss: vorschuss,
+      Bonus: bonus,
+      Auszahlung: grundgehalt - vorschuss + bonus
+    }
+  })
 
   // Yardımcı fonksiyonlar
   function getMitarbeiterName(id: string) {
@@ -280,6 +315,48 @@ export default function Dashboard({ mitarbeiter, onNavigate }: DashboardProps) {
           <p className="text-slate-500 text-sm">Heute abwesend</p>
           <p className="text-2xl font-bold text-slate-900">{todayOnLeave.length}</p>
           <p className="text-slate-400 text-xs mt-1">Mitarbeiter</p>
+        </div>
+      </div>
+
+      {/* Yıllık Ödeme Grafiği */}
+      <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 mb-8">
+        <div className="flex items-center justify-between mb-6">
+          <h3 className="font-semibold text-slate-900">Zahlungsübersicht {new Date().getFullYear()}</h3>
+          <div className="flex items-center gap-4 text-sm">
+            <div className="flex items-center gap-2">
+              <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
+              <span className="text-slate-600">Gehalt</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-3 h-3 bg-orange-500 rounded-full"></div>
+              <span className="text-slate-600">Vorschuss</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+              <span className="text-slate-600">Bonus</span>
+            </div>
+          </div>
+        </div>
+        <div className="h-72">
+          <ResponsiveContainer width="100%" height="100%">
+            <BarChart data={chartData}>
+              <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
+              <XAxis dataKey="name" tick={{ fill: '#64748b', fontSize: 12 }} />
+              <YAxis tick={{ fill: '#64748b', fontSize: 12 }} tickFormatter={(value) => `${value.toLocaleString('de-DE')}€`} />
+              <Tooltip
+                formatter={(value: number) => `${value.toLocaleString('de-DE')} €`}
+                contentStyle={{
+                  backgroundColor: '#1e293b',
+                  border: 'none',
+                  borderRadius: '12px',
+                  color: '#fff'
+                }}
+              />
+              <Bar dataKey="Gehalt" fill="#3b82f6" radius={[4, 4, 0, 0]} />
+              <Bar dataKey="Vorschuss" fill="#f97316" radius={[4, 4, 0, 0]} />
+              <Bar dataKey="Bonus" fill="#22c55e" radius={[4, 4, 0, 0]} />
+            </BarChart>
+          </ResponsiveContainer>
         </div>
       </div>
 
