@@ -1,65 +1,662 @@
-import Image from "next/image";
+'use client'
+
+import { useEffect, useState } from 'react'
+import { supabase } from '@/lib/supabase'
+import { Mitarbeiter } from '@/types/database'
+import Zahlungen from '@/components/Zahlungen'
+import Dokumente from '@/components/Dokumente'
+import UrlaubComponent from '@/components/Urlaub'
+import {
+  Users,
+  CreditCard,
+  FileText,
+  Calendar,
+  Plus,
+  Search,
+  Edit,
+  Trash2,
+  Phone,
+  Mail,
+  Menu,
+  X,
+  ChevronRight,
+  Euro
+} from 'lucide-react'
 
 export default function Home() {
+  const [mitarbeiter, setMitarbeiter] = useState<Mitarbeiter[]>([])
+  const [loading, setLoading] = useState(true)
+  const [activeTab, setActiveTab] = useState('mitarbeiter')
+  const [sidebarOpen, setSidebarOpen] = useState(false)
+  const [searchTerm, setSearchTerm] = useState('')
+  const [showModal, setShowModal] = useState(false)
+  const [formData, setFormData] = useState({
+    vorname: '',
+    nachname: '',
+    geburtsdatum: '',
+    telefon: '',
+    email: '',
+    adresse: '',
+    position: 'Fahrer',
+    grundgehalt: '',
+    notizen: ''
+  })
+  const [saving, setSaving] = useState(false)
+
+  useEffect(() => {
+    fetchMitarbeiter()
+  }, [])
+
+  async function fetchMitarbeiter() {
+    const { data, error } = await supabase
+      .from('mitarbeiter')
+      .select('*')
+      .order('nachname', { ascending: true })
+
+    if (error) {
+      console.error('Fehler:', error)
+    } else {
+      setMitarbeiter(data || [])
+    }
+    setLoading(false)
+  }
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault()
+    setSaving(true)
+
+    const { error } = await supabase
+      .from('mitarbeiter')
+      .insert([{
+        vorname: formData.vorname,
+        nachname: formData.nachname,
+        geburtsdatum: formData.geburtsdatum || null,
+        telefon: formData.telefon || null,
+        email: formData.email || null,
+        adresse: formData.adresse || null,
+        position: formData.position,
+        grundgehalt: parseFloat(formData.grundgehalt) || 0,
+        notizen: formData.notizen || null
+      }])
+
+    if (error) {
+      alert('Fehler beim Speichern: ' + error.message)
+    } else {
+      setShowModal(false)
+      setFormData({
+        vorname: '',
+        nachname: '',
+        geburtsdatum: '',
+        telefon: '',
+        email: '',
+        adresse: '',
+        position: 'Fahrer',
+        grundgehalt: '',
+        notizen: ''
+      })
+      fetchMitarbeiter()
+    }
+    setSaving(false)
+  }
+
+  const filteredMitarbeiter = mitarbeiter.filter(m =>
+    `${m.vorname} ${m.nachname}`.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    m.position.toLowerCase().includes(searchTerm.toLowerCase())
+  )
+
+  const menuItems = [
+    { id: 'mitarbeiter', label: 'Mitarbeiter', icon: Users, count: mitarbeiter.length },
+    { id: 'zahlungen', label: 'Zahlungen', icon: CreditCard, count: 0 },
+    { id: 'dokumente', label: 'Dokumente', icon: FileText, count: 0 },
+    { id: 'urlaub', label: 'Urlaub', icon: Calendar, count: 0 },
+  ]
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 to-slate-800">
+        <div className="flex flex-col items-center gap-4">
+          <div className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+          <p className="text-white text-lg">Laden...</p>
+        </div>
+      </div>
+    )
+  }
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+    <div className="min-h-screen bg-slate-100">
+      {/* Mobile Header */}
+      <header className="lg:hidden bg-slate-900 text-white p-4 flex items-center justify-between sticky top-0 z-50">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center">
+            <Users size={20} />
+          </div>
+          <span className="font-bold text-lg">Personalverwaltung</span>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
+        <button
+          onClick={() => setSidebarOpen(!sidebarOpen)}
+          className="p-2 hover:bg-slate-800 rounded-lg transition-colors"
+        >
+          {sidebarOpen ? <X size={24} /> : <Menu size={24} />}
+        </button>
+      </header>
+
+      <div className="flex">
+        {/* Sidebar - Desktop */}
+        <aside className="hidden lg:flex flex-col w-72 bg-slate-900 min-h-screen p-6 fixed left-0 top-0">
+          <div className="flex items-center gap-3 mb-10">
+            <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center">
+              <Users size={24} className="text-white" />
+            </div>
+            <div>
+              <h1 className="text-white font-bold text-xl">Personal</h1>
+              <p className="text-slate-400 text-sm">Verwaltungssystem</p>
+            </div>
+          </div>
+
+          <nav className="flex-1 space-y-2">
+            {menuItems.map((item) => (
+              <button
+                key={item.id}
+                onClick={() => setActiveTab(item.id)}
+                className={`w-full flex items-center justify-between p-4 rounded-xl transition-all duration-200 group ${
+                  activeTab === item.id
+                    ? 'bg-gradient-to-r from-blue-600 to-blue-700 text-white shadow-lg shadow-blue-500/30'
+                    : 'text-slate-400 hover:bg-slate-800 hover:text-white'
+                }`}
+              >
+                <div className="flex items-center gap-3">
+                  <item.icon size={20} />
+                  <span className="font-medium">{item.label}</span>
+                </div>
+                <span className={`text-sm px-2 py-1 rounded-lg ${
+                  activeTab === item.id
+                    ? 'bg-white/20'
+                    : 'bg-slate-800 group-hover:bg-slate-700'
+                }`}>
+                  {item.count}
+                </span>
+              </button>
+            ))}
+          </nav>
+
+          <div className="mt-auto pt-6 border-t border-slate-800">
+            <div className="bg-gradient-to-r from-blue-600/20 to-purple-600/20 rounded-xl p-4">
+              <p className="text-slate-300 text-sm mb-2">Angemeldet als</p>
+              <p className="text-white font-semibold">Administrator</p>
+            </div>
+          </div>
+        </aside>
+
+        {/* Sidebar - Mobile Overlay */}
+        {sidebarOpen && (
+          <div className="lg:hidden fixed inset-0 z-40">
+            <div
+              className="absolute inset-0 bg-black/50 backdrop-blur-sm"
+              onClick={() => setSidebarOpen(false)}
             />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+            <aside className="absolute left-0 top-0 bottom-0 w-72 bg-slate-900 p-6 shadow-2xl">
+              <nav className="space-y-2 mt-4">
+                {menuItems.map((item) => (
+                  <button
+                    key={item.id}
+                    onClick={() => {
+                      setActiveTab(item.id)
+                      setSidebarOpen(false)
+                    }}
+                    className={`w-full flex items-center justify-between p-4 rounded-xl transition-all ${
+                      activeTab === item.id
+                        ? 'bg-gradient-to-r from-blue-600 to-blue-700 text-white'
+                        : 'text-slate-400 hover:bg-slate-800 hover:text-white'
+                    }`}
+                  >
+                    <div className="flex items-center gap-3">
+                      <item.icon size={20} />
+                      <span className="font-medium">{item.label}</span>
+                    </div>
+                    <span className="text-sm px-2 py-1 rounded-lg bg-slate-800">
+                      {item.count}
+                    </span>
+                  </button>
+                ))}
+              </nav>
+            </aside>
+          </div>
+        )}
+
+        {/* Main Content */}
+        <main className="flex-1 lg:ml-72 p-4 lg:p-8">
+          {/* Page Header */}
+          <div className="mb-8">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+              <div>
+                <h2 className="text-2xl lg:text-3xl font-bold text-slate-900">
+                  Mitarbeiterliste
+                </h2>
+                <p className="text-slate-500 mt-1">
+                  Verwalten Sie alle Mitarbeiterdaten
+                </p>
+              </div>
+              <button
+                onClick={() => setShowModal(true)}
+                className="flex items-center justify-center gap-2 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white px-6 py-3 rounded-xl font-semibold shadow-lg shadow-blue-500/30 transition-all hover:scale-105">
+                <Plus size={20} />
+                <span>Neuer Mitarbeiter</span>
+              </button>
+            </div>
+
+            {/* Search Bar */}
+            <div className="mt-6 relative">
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={20} />
+              <input
+                type="text"
+                placeholder="Mitarbeiter suchen..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full pl-12 pr-4 py-3 bg-white border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+              />
+            </div>
+          </div>
+
+          {/* Stats Cards */}
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+            <div className="bg-white rounded-2xl p-4 lg:p-6 shadow-sm border border-slate-200">
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center">
+                  <Users className="text-blue-600" size={24} />
+                </div>
+                <div>
+                  <p className="text-slate-500 text-sm">Gesamt</p>
+                  <p className="text-2xl font-bold text-slate-900">{mitarbeiter.length}</p>
+                </div>
+              </div>
+            </div>
+            <div className="bg-white rounded-2xl p-4 lg:p-6 shadow-sm border border-slate-200">
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center">
+                  <Users className="text-green-600" size={24} />
+                </div>
+                <div>
+                  <p className="text-slate-500 text-sm">Aktiv</p>
+                  <p className="text-2xl font-bold text-slate-900">
+                    {mitarbeiter.filter(m => m.aktiv).length}
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div className="bg-white rounded-2xl p-4 lg:p-6 shadow-sm border border-slate-200">
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center">
+                  <Euro className="text-purple-600" size={24} />
+                </div>
+                <div>
+                  <p className="text-slate-500 text-sm">Gehaltskosten</p>
+                  <p className="text-xl lg:text-2xl font-bold text-slate-900">
+                    {mitarbeiter.reduce((sum, m) => sum + m.grundgehalt, 0).toLocaleString('de-DE')}€
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div className="bg-white rounded-2xl p-4 lg:p-6 shadow-sm border border-slate-200">
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 bg-orange-100 rounded-xl flex items-center justify-center">
+                  <Calendar className="text-orange-600" size={24} />
+                </div>
+                <div>
+                  <p className="text-slate-500 text-sm">Im Urlaub</p>
+                  <p className="text-2xl font-bold text-slate-900">0</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Zahlungen Tab */}
+          {activeTab === 'zahlungen' && (
+            <Zahlungen mitarbeiter={mitarbeiter} onUpdate={fetchMitarbeiter} />
+          )}
+
+          {/* Urlaub Tab */}
+          {activeTab === 'urlaub' && (
+            <UrlaubComponent mitarbeiter={mitarbeiter} onUpdate={fetchMitarbeiter} />
+          )}
+
+          {/* Dokumente Tab */}
+          {activeTab === 'dokumente' && (
+            <Dokumente mitarbeiter={mitarbeiter} onUpdate={fetchMitarbeiter} />
+          )}
+
+          {/* Mitarbeiter Tab */}
+          {activeTab === 'mitarbeiter' && (
+          <>
+          {/* Employee Cards - Mobile */}
+          <div className="lg:hidden space-y-4">
+            {filteredMitarbeiter.map((m) => (
+              <div key={m.id} className="bg-white rounded-2xl p-4 shadow-sm border border-slate-200">
+                <div className="flex items-start justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center text-white font-bold text-lg">
+                      {m.vorname[0]}{m.nachname[0]}
+                    </div>
+                    <div>
+                      <h3 className="font-semibold text-slate-900">{m.vorname} {m.nachname}</h3>
+                      <p className="text-slate-500 text-sm">{m.position}</p>
+                    </div>
+                  </div>
+                  <span className={`px-3 py-1 rounded-full text-xs font-medium ${
+                    m.aktiv
+                      ? 'bg-green-100 text-green-700'
+                      : 'bg-red-100 text-red-700'
+                  }`}>
+                    {m.aktiv ? 'Aktiv' : 'Inaktiv'}
+                  </span>
+                </div>
+
+                <div className="mt-4 space-y-2">
+                  {m.telefon && (
+                    <div className="flex items-center gap-2 text-slate-600">
+                      <Phone size={16} />
+                      <span className="text-sm">{m.telefon}</span>
+                    </div>
+                  )}
+                  {m.email && (
+                    <div className="flex items-center gap-2 text-slate-600">
+                      <Mail size={16} />
+                      <span className="text-sm">{m.email}</span>
+                    </div>
+                  )}
+                  <div className="flex items-center gap-2 text-slate-600">
+                    <Euro size={16} />
+                    <span className="text-sm font-medium">
+                      {m.grundgehalt.toLocaleString('de-DE')} € / Monat
+                    </span>
+                  </div>
+                </div>
+
+                <div className="mt-4 pt-4 border-t border-slate-100 flex gap-2">
+                  <button className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl transition-colors">
+                    <Edit size={16} />
+                    <span>Bearbeiten</span>
+                  </button>
+                  <button className="flex items-center justify-center p-2 text-red-600 hover:bg-red-50 rounded-xl transition-colors">
+                    <Trash2 size={18} />
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Employee Table - Desktop */}
+          <div className="hidden lg:block bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+            <table className="w-full">
+              <thead>
+                <tr className="bg-slate-50 border-b border-slate-200">
+                  <th className="text-left p-5 font-semibold text-slate-600">Mitarbeiter</th>
+                  <th className="text-left p-5 font-semibold text-slate-600">Position</th>
+                  <th className="text-left p-5 font-semibold text-slate-600">Kontakt</th>
+                  <th className="text-left p-5 font-semibold text-slate-600">Gehalt</th>
+                  <th className="text-left p-5 font-semibold text-slate-600">Status</th>
+                  <th className="text-right p-5 font-semibold text-slate-600">Aktionen</th>
+                </tr>
+              </thead>
+              <tbody>
+                {filteredMitarbeiter.map((m) => (
+                  <tr key={m.id} className="border-b border-slate-100 hover:bg-slate-50 transition-colors">
+                    <td className="p-5">
+                      <div className="flex items-center gap-4">
+                        <div className="w-11 h-11 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center text-white font-semibold">
+                          {m.vorname[0]}{m.nachname[0]}
+                        </div>
+                        <div>
+                          <p className="font-semibold text-slate-900">{m.vorname} {m.nachname}</p>
+                          <p className="text-slate-500 text-sm">
+                            Seit {new Date(m.eintrittsdatum).toLocaleDateString('de-DE')}
+                          </p>
+                        </div>
+                      </div>
+                    </td>
+                    <td className="p-5">
+                      <span className="px-3 py-1 bg-slate-100 text-slate-700 rounded-lg text-sm font-medium">
+                        {m.position}
+                      </span>
+                    </td>
+                    <td className="p-5">
+                      <div className="space-y-1">
+                        {m.telefon && (
+                          <div className="flex items-center gap-2 text-slate-600">
+                            <Phone size={14} />
+                            <span className="text-sm">{m.telefon}</span>
+                          </div>
+                        )}
+                        {m.email && (
+                          <div className="flex items-center gap-2 text-slate-600">
+                            <Mail size={14} />
+                            <span className="text-sm">{m.email}</span>
+                          </div>
+                        )}
+                      </div>
+                    </td>
+                    <td className="p-5">
+                      <span className="text-slate-900 font-semibold">
+                        {m.grundgehalt.toLocaleString('de-DE')} €
+                      </span>
+                      <span className="text-slate-500 text-sm"> / Monat</span>
+                    </td>
+                    <td className="p-5">
+                      <span className={`px-3 py-1 rounded-full text-sm font-medium ${
+                        m.aktiv
+                          ? 'bg-green-100 text-green-700'
+                          : 'bg-red-100 text-red-700'
+                      }`}>
+                        {m.aktiv ? 'Aktiv' : 'Inaktiv'}
+                      </span>
+                    </td>
+                    <td className="p-5">
+                      <div className="flex items-center justify-end gap-2">
+                        <button className="p-2 text-slate-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors">
+                          <Edit size={18} />
+                        </button>
+                        <button className="p-2 text-slate-600 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors">
+                          <Trash2 size={18} />
+                        </button>
+                        <button className="p-2 text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-lg transition-colors">
+                          <ChevronRight size={18} />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+
+            {filteredMitarbeiter.length === 0 && (
+              <div className="p-12 text-center">
+                <div className="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <Users className="text-slate-400" size={32} />
+                </div>
+                <p className="text-slate-500 text-lg">Keine Mitarbeiter gefunden</p>
+              </div>
+            )}
+          </div>
+          </>
+          )}
+        </main>
+      </div>
+
+      {/* Modal */}
+      {showModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div
+            className="absolute inset-0 bg-black/50 backdrop-blur-sm"
+            onClick={() => setShowModal(false)}
+          />
+          <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+            {/* Modal Header */}
+            <div className="sticky top-0 bg-white border-b border-slate-200 p-6 flex items-center justify-between rounded-t-2xl">
+              <h3 className="text-xl font-bold text-slate-900">Neuer Mitarbeiter</h3>
+              <button
+                onClick={() => setShowModal(false)}
+                className="p-2 hover:bg-slate-100 rounded-lg transition-colors"
+              >
+                <X size={20} />
+              </button>
+            </div>
+
+            {/* Modal Body */}
+            <form onSubmit={handleSubmit} className="p-6 space-y-6">
+              {/* Persönliche Daten */}
+              <div>
+                <h4 className="text-sm font-semibold text-slate-500 uppercase tracking-wide mb-4">
+                  Persönliche Daten
+                </h4>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-2">
+                      Vorname *
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      value={formData.vorname}
+                      onChange={(e) => setFormData({...formData, vorname: e.target.value})}
+                      className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      placeholder="Max"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-2">
+                      Nachname *
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      value={formData.nachname}
+                      onChange={(e) => setFormData({...formData, nachname: e.target.value})}
+                      className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      placeholder="Mustermann"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-2">
+                      Geburtsdatum
+                    </label>
+                    <input
+                      type="date"
+                      value={formData.geburtsdatum}
+                      onChange={(e) => setFormData({...formData, geburtsdatum: e.target.value})}
+                      className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-2">
+                      Telefon
+                    </label>
+                    <input
+                      type="tel"
+                      value={formData.telefon}
+                      onChange={(e) => setFormData({...formData, telefon: e.target.value})}
+                      className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      placeholder="+49 123 456 7890"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-2">
+                      E-Mail
+                    </label>
+                    <input
+                      type="email"
+                      value={formData.email}
+                      onChange={(e) => setFormData({...formData, email: e.target.value})}
+                      className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      placeholder="max@beispiel.de"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-2">
+                      Adresse
+                    </label>
+                    <input
+                      type="text"
+                      value={formData.adresse}
+                      onChange={(e) => setFormData({...formData, adresse: e.target.value})}
+                      className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      placeholder="Musterstraße 1, 12345 Berlin"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Arbeitsdaten */}
+              <div>
+                <h4 className="text-sm font-semibold text-slate-500 uppercase tracking-wide mb-4">
+                  Arbeitsdaten
+                </h4>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-2">
+                      Position
+                    </label>
+                    <select
+                      value={formData.position}
+                      onChange={(e) => setFormData({...formData, position: e.target.value})}
+                      className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white"
+                    >
+                      <option value="Fahrer">Fahrer</option>
+                      <option value="Lagerarbeiter">Lagerarbeiter</option>
+                      <option value="Disponent">Disponent</option>
+                      <option value="Verwaltung">Verwaltung</option>
+                      <option value="Geschäftsführer">Geschäftsführer</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-2">
+                      Grundgehalt (€)
+                    </label>
+                    <input
+                      type="number"
+                      step="0.01"
+                      value={formData.grundgehalt}
+                      onChange={(e) => setFormData({...formData, grundgehalt: e.target.value})}
+                      className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      placeholder="3500.00"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Notizen */}
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-2">
+                  Notizen
+                </label>
+                <textarea
+                  value={formData.notizen}
+                  onChange={(e) => setFormData({...formData, notizen: e.target.value})}
+                  rows={3}
+                  className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+                  placeholder="Zusätzliche Informationen..."
+                />
+              </div>
+
+              {/* Buttons */}
+              <div className="flex gap-3 pt-4">
+                <button
+                  type="button"
+                  onClick={() => setShowModal(false)}
+                  className="flex-1 px-6 py-3 border border-slate-200 text-slate-700 rounded-xl font-semibold hover:bg-slate-50 transition-colors"
+                >
+                  Abbrechen
+                </button>
+                <button
+                  type="submit"
+                  disabled={saving}
+                  className="flex-1 px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-xl font-semibold hover:from-blue-700 hover:to-blue-800 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {saving ? 'Speichern...' : 'Mitarbeiter anlegen'}
+                </button>
+              </div>
+            </form>
+          </div>
         </div>
-      </main>
+      )}
     </div>
-  );
+  )
 }
