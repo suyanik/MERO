@@ -606,9 +606,6 @@ export default function Home() {
                         >
                           <Trash2 size={18} />
                         </button>
-                        <button className="p-2 text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-lg transition-colors">
-                          <ChevronRight size={18} />
-                        </button>
                       </div>
                     </td>
                   </tr>
@@ -835,7 +832,7 @@ export default function Home() {
                       required
                       value={formData.vorname}
                       onChange={(e) => setFormData({...formData, vorname: e.target.value})}
-                      className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white text-slate-900 placeholder-slate-400"
                       placeholder="Max"
                     />
                   </div>
@@ -848,7 +845,7 @@ export default function Home() {
                       required
                       value={formData.nachname}
                       onChange={(e) => setFormData({...formData, nachname: e.target.value})}
-                      className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white text-slate-900 placeholder-slate-400"
                       placeholder="Mustermann"
                     />
                   </div>
@@ -860,7 +857,7 @@ export default function Home() {
                       type="date"
                       value={formData.geburtsdatum}
                       onChange={(e) => setFormData({...formData, geburtsdatum: e.target.value})}
-                      className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white text-slate-900 placeholder-slate-400"
                     />
                   </div>
                   <div>
@@ -871,7 +868,7 @@ export default function Home() {
                       type="tel"
                       value={formData.telefon}
                       onChange={(e) => setFormData({...formData, telefon: e.target.value})}
-                      className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white text-slate-900 placeholder-slate-400"
                       placeholder="+49 123 456 7890"
                     />
                   </div>
@@ -883,7 +880,7 @@ export default function Home() {
                       type="email"
                       value={formData.email}
                       onChange={(e) => setFormData({...formData, email: e.target.value})}
-                      className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white text-slate-900 placeholder-slate-400"
                       placeholder="max@beispiel.de"
                     />
                   </div>
@@ -895,7 +892,7 @@ export default function Home() {
                       type="text"
                       value={formData.adresse}
                       onChange={(e) => setFormData({...formData, adresse: e.target.value})}
-                      className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white text-slate-900 placeholder-slate-400"
                       placeholder="Musterstraße 1, 12345 Berlin"
                     />
                   </div>
@@ -933,7 +930,7 @@ export default function Home() {
                       step="0.01"
                       value={formData.grundgehalt}
                       onChange={(e) => setFormData({...formData, grundgehalt: e.target.value})}
-                      className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white text-slate-900 placeholder-slate-400"
                       placeholder="3500.00"
                     />
                   </div>

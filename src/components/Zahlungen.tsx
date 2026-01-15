@@ -161,7 +161,7 @@ export default function Zahlungen({ mitarbeiter, onUpdate }: ZahlungenProps) {
               type="month"
               value={selectedMonth}
               onChange={(e) => setSelectedMonth(e.target.value)}
-              className="px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+              className="px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-slate-900 placeholder-slate-400"
             />
             <button
               onClick={() => setShowModal(true)}
@@ -326,7 +326,7 @@ export default function Zahlungen({ mitarbeiter, onUpdate }: ZahlungenProps) {
                   required
                   value={formData.mitarbeiter_id}
                   onChange={(e) => setFormData({...formData, mitarbeiter_id: e.target.value})}
-                  className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+                  className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-slate-900 placeholder-slate-400"
                 >
                   <option value="">Bitte auswählen...</option>
                   {aktiveMitarbeiter.map((m) => (
@@ -387,7 +387,7 @@ export default function Zahlungen({ mitarbeiter, onUpdate }: ZahlungenProps) {
                     required
                     value={formData.betrag}
                     onChange={(e) => setFormData({...formData, betrag: e.target.value})}
-                    className="w-full pl-12 pr-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full pl-12 pr-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-slate-900 placeholder-slate-400"
                     placeholder="500.00"
                   />
                 </div>
@@ -403,7 +403,7 @@ export default function Zahlungen({ mitarbeiter, onUpdate }: ZahlungenProps) {
                   required
                   value={formData.zahlungsdatum}
                   onChange={(e) => setFormData({...formData, zahlungsdatum: e.target.value})}
-                  className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-slate-900 placeholder-slate-400"
                 />
               </div>
 
@@ -416,7 +416,7 @@ export default function Zahlungen({ mitarbeiter, onUpdate }: ZahlungenProps) {
                   type="text"
                   value={formData.beschreibung}
                   onChange={(e) => setFormData({...formData, beschreibung: e.target.value})}
-                  className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-slate-900 placeholder-slate-400"
                   placeholder="z.B. Vorschuss für Miete"
                 />
               </div>

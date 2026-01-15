@@ -487,7 +487,7 @@ export default function UrlaubComponent({ mitarbeiter, onUpdate }: UrlaubProps) 
                   required
                   value={formData.mitarbeiter_id}
                   onChange={(e) => setFormData({...formData, mitarbeiter_id: e.target.value})}
-                  className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+                  className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-slate-900 placeholder-slate-400"
                 >
                   <option value="">Bitte auswählen...</option>
                   {aktiveMitarbeiter.map((m) => (
@@ -544,7 +544,7 @@ export default function UrlaubComponent({ mitarbeiter, onUpdate }: UrlaubProps) 
                     required
                     value={formData.startdatum}
                     onChange={(e) => setFormData({...formData, startdatum: e.target.value})}
-                    className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-slate-900 placeholder-slate-400"
                   />
                 </div>
                 <div>
@@ -557,7 +557,7 @@ export default function UrlaubComponent({ mitarbeiter, onUpdate }: UrlaubProps) 
                     value={formData.enddatum}
                     min={formData.startdatum}
                     onChange={(e) => setFormData({...formData, enddatum: e.target.value})}
-                    className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-slate-900 placeholder-slate-400"
                   />
                 </div>
               </div>
@@ -581,7 +581,7 @@ export default function UrlaubComponent({ mitarbeiter, onUpdate }: UrlaubProps) 
                   value={formData.notizen}
                   onChange={(e) => setFormData({...formData, notizen: e.target.value})}
                   rows={2}
-                  className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+                  className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-slate-900 placeholder-slate-400 resize-none"
                   placeholder="z.B. Grund für Sonderurlaub..."
                 />
               </div>

@@ -432,7 +432,7 @@ export default function Dokumente({ mitarbeiter, onUpdate }: DokumenteProps) {
                   required
                   value={formData.mitarbeiter_id}
                   onChange={(e) => setFormData({...formData, mitarbeiter_id: e.target.value})}
-                  className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+                  className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-slate-900 placeholder-slate-400"
                 >
                   <option value="">Bitte auswählen...</option>
                   {aktiveMitarbeiter.map((m) => (
@@ -452,7 +452,7 @@ export default function Dokumente({ mitarbeiter, onUpdate }: DokumenteProps) {
                   required
                   value={formData.dokumenttyp}
                   onChange={(e) => setFormData({...formData, dokumenttyp: e.target.value as any})}
-                  className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+                  className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-slate-900 placeholder-slate-400"
                 >
                   <option value="fuehrerschein">Führerschein</option>
                   <option value="reisepass">Reisepass</option>
@@ -472,7 +472,7 @@ export default function Dokumente({ mitarbeiter, onUpdate }: DokumenteProps) {
                   type="text"
                   value={formData.dokumentname}
                   onChange={(e) => setFormData({...formData, dokumentname: e.target.value})}
-                  className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-slate-900 placeholder-slate-400"
                   placeholder="z.B. Führerschein Klasse CE"
                 />
               </div>
@@ -486,7 +486,7 @@ export default function Dokumente({ mitarbeiter, onUpdate }: DokumenteProps) {
                   type="date"
                   value={formData.ablaufdatum}
                   onChange={(e) => setFormData({...formData, ablaufdatum: e.target.value})}
-                  className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-slate-900 placeholder-slate-400"
                 />
               </div>
 
@@ -565,7 +565,7 @@ export default function Dokumente({ mitarbeiter, onUpdate }: DokumenteProps) {
                   value={formData.notizen}
                   onChange={(e) => setFormData({...formData, notizen: e.target.value})}
                   rows={2}
-                  className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+                  className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-slate-900 placeholder-slate-400 resize-none"
                   placeholder="Zusätzliche Informationen..."
                 />
               </div>
