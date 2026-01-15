@@ -8,6 +8,7 @@ import Dokumente from '@/components/Dokumente'
 import UrlaubComponent from '@/components/Urlaub'
 import Dashboard from '@/components/Dashboard'
 import Login from '@/components/Login'
+import MitarbeiterDetail from '@/components/MitarbeiterDetail'
 import {
   Users,
   CreditCard,
@@ -49,6 +50,7 @@ export default function Home() {
   const [saving, setSaving] = useState(false)
   const [editingMitarbeiter, setEditingMitarbeiter] = useState<Mitarbeiter | null>(null)
   const [showEditModal, setShowEditModal] = useState(false)
+  const [selectedMitarbeiter, setSelectedMitarbeiter] = useState<Mitarbeiter | null>(null)
   const [editFormData, setEditFormData] = useState({
     vorname: '',
     nachname: '',
@@ -467,7 +469,7 @@ export default function Home() {
           {/* Employee Cards - Mobile */}
           <div className="lg:hidden space-y-4">
             {filteredMitarbeiter.map((m) => (
-              <div key={m.id} className="bg-white rounded-2xl p-4 shadow-sm border border-slate-200">
+              <div key={m.id} className="bg-white rounded-2xl p-4 shadow-sm border border-slate-200 cursor-pointer" onClick={() => setSelectedMitarbeiter(m)}>
                 <div className="flex items-start justify-between">
                   <div className="flex items-center gap-3">
                     <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center text-white font-bold text-lg">
@@ -510,14 +512,14 @@ export default function Home() {
 
                 <div className="mt-4 pt-4 border-t border-slate-100 flex gap-2">
                   <button
-                    onClick={() => openEditModal(m)}
+                    onClick={(e) => { e.stopPropagation(); openEditModal(m); }}
                     className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl transition-colors"
                   >
                     <Edit size={16} />
                     <span>Bearbeiten</span>
                   </button>
                   <button
-                    onClick={() => handleDelete(m.id)}
+                    onClick={(e) => { e.stopPropagation(); handleDelete(m.id); }}
                     className="flex items-center justify-center p-2 text-red-600 hover:bg-red-50 rounded-xl transition-colors"
                   >
                     <Trash2 size={18} />
@@ -542,7 +544,7 @@ export default function Home() {
               </thead>
               <tbody>
                 {filteredMitarbeiter.map((m) => (
-                  <tr key={m.id} className="border-b border-slate-100 hover:bg-slate-50 transition-colors">
+                  <tr key={m.id} className="border-b border-slate-100 hover:bg-slate-50 transition-colors cursor-pointer" onClick={() => setSelectedMitarbeiter(m)}>
                     <td className="p-5">
                       <div className="flex items-center gap-4">
                         <div className="w-11 h-11 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center text-white font-semibold">
@@ -595,13 +597,13 @@ export default function Home() {
                     <td className="p-5">
                       <div className="flex items-center justify-end gap-2">
                         <button
-                          onClick={() => openEditModal(m)}
+                          onClick={(e) => { e.stopPropagation(); openEditModal(m); }}
                           className="p-2 text-slate-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
                         >
                           <Edit size={18} />
                         </button>
                         <button
-                          onClick={() => handleDelete(m.id)}
+                          onClick={(e) => { e.stopPropagation(); handleDelete(m.id); }}
                           className="p-2 text-slate-600 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
                         >
                           <Trash2 size={18} />
@@ -971,6 +973,14 @@ export default function Home() {
             </form>
           </div>
         </div>
+      )}
+
+      {/* Mitarbeiter Detail Modal */}
+      {selectedMitarbeiter && (
+        <MitarbeiterDetail
+          mitarbeiter={selectedMitarbeiter}
+          onClose={() => setSelectedMitarbeiter(null)}
+        />
       )}
     </div>
   )
