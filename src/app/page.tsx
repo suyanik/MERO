@@ -678,7 +678,7 @@ export default function Home() {
                       required
                       value={editFormData.vorname}
                       onChange={(e) => setEditFormData({...editFormData, vorname: e.target.value})}
-                      className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-slate-900 placeholder-slate-400"
                     />
                   </div>
                   <div>
@@ -688,7 +688,7 @@ export default function Home() {
                       required
                       value={editFormData.nachname}
                       onChange={(e) => setEditFormData({...editFormData, nachname: e.target.value})}
-                      className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-slate-900 placeholder-slate-400"
                     />
                   </div>
                   <div>
@@ -697,7 +697,7 @@ export default function Home() {
                       type="date"
                       value={editFormData.geburtsdatum}
                       onChange={(e) => setEditFormData({...editFormData, geburtsdatum: e.target.value})}
-                      className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-slate-900 placeholder-slate-400"
                     />
                   </div>
                   <div>
@@ -706,7 +706,7 @@ export default function Home() {
                       type="tel"
                       value={editFormData.telefon}
                       onChange={(e) => setEditFormData({...editFormData, telefon: e.target.value})}
-                      className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-slate-900 placeholder-slate-400"
                     />
                   </div>
                   <div>
@@ -715,7 +715,7 @@ export default function Home() {
                       type="email"
                       value={editFormData.email}
                       onChange={(e) => setEditFormData({...editFormData, email: e.target.value})}
-                      className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-slate-900 placeholder-slate-400"
                     />
                   </div>
                   <div>
@@ -724,7 +724,7 @@ export default function Home() {
                       type="text"
                       value={editFormData.adresse}
                       onChange={(e) => setEditFormData({...editFormData, adresse: e.target.value})}
-                      className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-slate-900 placeholder-slate-400"
                     />
                   </div>
                 </div>
@@ -741,7 +741,7 @@ export default function Home() {
                     <select
                       value={editFormData.position}
                       onChange={(e) => setEditFormData({...editFormData, position: e.target.value})}
-                      className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+                      className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-slate-900"
                     >
                       <option value="Fahrer">Fahrer</option>
                       <option value="Lagerarbeiter">Lagerarbeiter</option>
@@ -757,7 +757,7 @@ export default function Home() {
                       step="0.01"
                       value={editFormData.grundgehalt}
                       onChange={(e) => setEditFormData({...editFormData, grundgehalt: e.target.value})}
-                      className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-slate-900 placeholder-slate-400"
                     />
                   </div>
                 </div>
@@ -770,7 +770,7 @@ export default function Home() {
                   value={editFormData.notizen}
                   onChange={(e) => setEditFormData({...editFormData, notizen: e.target.value})}
                   rows={3}
-                  className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+                  className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-slate-900 placeholder-slate-400 resize-none"
                 />
               </div>
 
@@ -912,7 +912,7 @@ export default function Home() {
                     <select
                       value={formData.position}
                       onChange={(e) => setFormData({...formData, position: e.target.value})}
-                      className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white"
+                      className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white text-slate-900"
                     >
                       <option value="Fahrer">Fahrer</option>
                       <option value="Lagerarbeiter">Lagerarbeiter</option>
@@ -946,7 +946,7 @@ export default function Home() {
                   value={formData.notizen}
                   onChange={(e) => setFormData({...formData, notizen: e.target.value})}
                   rows={3}
-                  className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+                  className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white text-slate-900 placeholder-slate-400 resize-none"
                   placeholder="Zusätzliche Informationen..."
                 />
               </div>
