@@ -7,6 +7,7 @@ import Zahlungen from '@/components/Zahlungen'
 import Dokumente from '@/components/Dokumente'
 import UrlaubComponent from '@/components/Urlaub'
 import Dashboard from '@/components/Dashboard'
+import Login from '@/components/Login'
 import {
   Users,
   CreditCard,
@@ -28,6 +29,8 @@ import {
 export default function Home() {
   const [mitarbeiter, setMitarbeiter] = useState<Mitarbeiter[]>([])
   const [loading, setLoading] = useState(true)
+  const [session, setSession] = useState<any>(null)
+  const [authLoading, setAuthLoading] = useState(true)
   const [activeTab, setActiveTab] = useState('dashboard')
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [searchTerm, setSearchTerm] = useState('')
@@ -60,7 +63,24 @@ export default function Home() {
   })
 
   useEffect(() => {
-    fetchMitarbeiter()
+    // Auth durumunu kontrol et
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session)
+      setAuthLoading(false)
+      if (session) {
+        fetchMitarbeiter()
+      }
+    })
+
+    // Auth değişikliklerini dinle
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setSession(session)
+      if (session) {
+        fetchMitarbeiter()
+      }
+    })
+
+    return () => subscription.unsubscribe()
   }, [])
 
   async function fetchMitarbeiter() {
@@ -178,6 +198,11 @@ export default function Home() {
     }
   }
 
+  async function handleLogout() {
+    await supabase.auth.signOut()
+    setSession(null)
+  }
+
   const filteredMitarbeiter = mitarbeiter.filter(m =>
     `${m.vorname} ${m.nachname}`.toLowerCase().includes(searchTerm.toLowerCase()) ||
     m.position.toLowerCase().includes(searchTerm.toLowerCase())
@@ -190,6 +215,23 @@ export default function Home() {
     { id: 'dokumente', label: 'Dokumente', icon: FileText, count: 0 },
     { id: 'urlaub', label: 'Urlaub', icon: Calendar, count: 0 },
   ]
+
+  // Auth yüklenirken
+  if (authLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 to-slate-800">
+        <div className="flex flex-col items-center gap-4">
+          <div className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+          <p className="text-white text-lg">Laden...</p>
+        </div>
+      </div>
+    )
+  }
+
+  // Giriş yapılmamışsa
+  if (!session) {
+    return <Login onLogin={() => supabase.auth.getSession().then(({ data: { session } }) => setSession(session))} />
+  }
 
   if (loading) {
     return (
@@ -262,10 +304,16 @@ export default function Home() {
           </nav>
 
           <div className="mt-auto pt-6 border-t border-slate-800">
-            <div className="bg-gradient-to-r from-blue-600/20 to-purple-600/20 rounded-xl p-4">
-              <p className="text-slate-300 text-sm mb-2">Angemeldet als</p>
-              <p className="text-white font-semibold">Administrator</p>
+            <div className="bg-gradient-to-r from-blue-600/20 to-purple-600/20 rounded-xl p-4 mb-3">
+              <p className="text-slate-300 text-sm mb-1">Angemeldet als</p>
+              <p className="text-white font-semibold text-sm truncate">{session?.user?.email}</p>
             </div>
+            <button
+              onClick={handleLogout}
+              className="w-full px-4 py-3 bg-slate-800 text-white hover:bg-red-600 rounded-xl transition-colors font-medium"
+            >
+              Abmelden
+            </button>
           </div>
         </aside>
 
@@ -277,7 +325,7 @@ export default function Home() {
               onClick={() => setSidebarOpen(false)}
             />
             <aside className="absolute left-0 top-0 bottom-0 w-72 bg-slate-900 p-6 shadow-2xl">
-              <nav className="space-y-2 mt-4">
+              <nav className="space-y-2 mt-16">
                 {menuItems.map((item) => (
                   <button
                     key={item.id}
