@@ -42,6 +42,20 @@ export default function Home() {
     notizen: ''
   })
   const [saving, setSaving] = useState(false)
+  const [editingMitarbeiter, setEditingMitarbeiter] = useState<Mitarbeiter | null>(null)
+  const [showEditModal, setShowEditModal] = useState(false)
+  const [editFormData, setEditFormData] = useState({
+    vorname: '',
+    nachname: '',
+    geburtsdatum: '',
+    telefon: '',
+    email: '',
+    adresse: '',
+    position: 'Fahrer',
+    grundgehalt: '',
+    notizen: '',
+    aktiv: true
+  })
 
   useEffect(() => {
     fetchMitarbeiter()
@@ -97,6 +111,69 @@ export default function Home() {
       fetchMitarbeiter()
     }
     setSaving(false)
+  }
+
+  function openEditModal(m: Mitarbeiter) {
+    setEditingMitarbeiter(m)
+    setEditFormData({
+      vorname: m.vorname,
+      nachname: m.nachname,
+      geburtsdatum: m.geburtsdatum || '',
+      telefon: m.telefon || '',
+      email: m.email || '',
+      adresse: m.adresse || '',
+      position: m.position,
+      grundgehalt: m.grundgehalt.toString(),
+      notizen: m.notizen || '',
+      aktiv: m.aktiv
+    })
+    setShowEditModal(true)
+  }
+
+  async function handleEditSubmit(e: React.FormEvent) {
+    e.preventDefault()
+    if (!editingMitarbeiter) return
+    setSaving(true)
+
+    const { error } = await supabase
+      .from('mitarbeiter')
+      .update({
+        vorname: editFormData.vorname,
+        nachname: editFormData.nachname,
+        geburtsdatum: editFormData.geburtsdatum || null,
+        telefon: editFormData.telefon || null,
+        email: editFormData.email || null,
+        adresse: editFormData.adresse || null,
+        position: editFormData.position,
+        grundgehalt: parseFloat(editFormData.grundgehalt) || 0,
+        notizen: editFormData.notizen || null,
+        aktiv: editFormData.aktiv
+      })
+      .eq('id', editingMitarbeiter.id)
+
+    if (error) {
+      alert('Fehler beim Speichern: ' + error.message)
+    } else {
+      setShowEditModal(false)
+      setEditingMitarbeiter(null)
+      fetchMitarbeiter()
+    }
+    setSaving(false)
+  }
+
+  async function handleDelete(id: string) {
+    if (!confirm('Möchten Sie diesen Mitarbeiter wirklich löschen? Alle zugehörigen Daten (Zahlungen, Dokumente, Urlaub) werden ebenfalls gelöscht.')) return
+
+    const { error } = await supabase
+      .from('mitarbeiter')
+      .delete()
+      .eq('id', id)
+
+    if (error) {
+      alert('Fehler beim Löschen: ' + error.message)
+    } else {
+      fetchMitarbeiter()
+    }
   }
 
   const filteredMitarbeiter = mitarbeiter.filter(m =>
@@ -372,11 +449,17 @@ export default function Home() {
                 </div>
 
                 <div className="mt-4 pt-4 border-t border-slate-100 flex gap-2">
-                  <button className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl transition-colors">
+                  <button
+                    onClick={() => openEditModal(m)}
+                    className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl transition-colors"
+                  >
                     <Edit size={16} />
                     <span>Bearbeiten</span>
                   </button>
-                  <button className="flex items-center justify-center p-2 text-red-600 hover:bg-red-50 rounded-xl transition-colors">
+                  <button
+                    onClick={() => handleDelete(m.id)}
+                    className="flex items-center justify-center p-2 text-red-600 hover:bg-red-50 rounded-xl transition-colors"
+                  >
                     <Trash2 size={18} />
                   </button>
                 </div>
@@ -451,10 +534,16 @@ export default function Home() {
                     </td>
                     <td className="p-5">
                       <div className="flex items-center justify-end gap-2">
-                        <button className="p-2 text-slate-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors">
+                        <button
+                          onClick={() => openEditModal(m)}
+                          className="p-2 text-slate-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                        >
                           <Edit size={18} />
                         </button>
-                        <button className="p-2 text-slate-600 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors">
+                        <button
+                          onClick={() => handleDelete(m.id)}
+                          className="p-2 text-slate-600 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                        >
                           <Trash2 size={18} />
                         </button>
                         <button className="p-2 text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-lg transition-colors">
@@ -480,6 +569,175 @@ export default function Home() {
           )}
         </main>
       </div>
+
+      {/* Edit Modal */}
+      {showEditModal && editingMitarbeiter && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div
+            className="absolute inset-0 bg-black/50 backdrop-blur-sm"
+            onClick={() => setShowEditModal(false)}
+          />
+          <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+            <div className="sticky top-0 bg-white border-b border-slate-200 p-6 flex items-center justify-between rounded-t-2xl">
+              <h3 className="text-xl font-bold text-slate-900">Mitarbeiter bearbeiten</h3>
+              <button
+                onClick={() => setShowEditModal(false)}
+                className="p-2 hover:bg-slate-100 rounded-lg transition-colors"
+              >
+                <X size={20} />
+              </button>
+            </div>
+
+            <form onSubmit={handleEditSubmit} className="p-6 space-y-6">
+              {/* Status Toggle */}
+              <div className="flex items-center justify-between p-4 bg-slate-50 rounded-xl">
+                <div>
+                  <p className="font-medium text-slate-900">Mitarbeiter Status</p>
+                  <p className="text-sm text-slate-500">Inaktive Mitarbeiter werden ausgeblendet</p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setEditFormData({...editFormData, aktiv: !editFormData.aktiv})}
+                  className={`relative w-14 h-8 rounded-full transition-colors ${
+                    editFormData.aktiv ? 'bg-green-500' : 'bg-slate-300'
+                  }`}
+                >
+                  <span className={`absolute top-1 w-6 h-6 bg-white rounded-full shadow transition-transform ${
+                    editFormData.aktiv ? 'left-7' : 'left-1'
+                  }`} />
+                </button>
+              </div>
+
+              {/* Persönliche Daten */}
+              <div>
+                <h4 className="text-sm font-semibold text-slate-500 uppercase tracking-wide mb-4">
+                  Persönliche Daten
+                </h4>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-2">Vorname *</label>
+                    <input
+                      type="text"
+                      required
+                      value={editFormData.vorname}
+                      onChange={(e) => setEditFormData({...editFormData, vorname: e.target.value})}
+                      className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-2">Nachname *</label>
+                    <input
+                      type="text"
+                      required
+                      value={editFormData.nachname}
+                      onChange={(e) => setEditFormData({...editFormData, nachname: e.target.value})}
+                      className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-2">Geburtsdatum</label>
+                    <input
+                      type="date"
+                      value={editFormData.geburtsdatum}
+                      onChange={(e) => setEditFormData({...editFormData, geburtsdatum: e.target.value})}
+                      className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-2">Telefon</label>
+                    <input
+                      type="tel"
+                      value={editFormData.telefon}
+                      onChange={(e) => setEditFormData({...editFormData, telefon: e.target.value})}
+                      className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-2">E-Mail</label>
+                    <input
+                      type="email"
+                      value={editFormData.email}
+                      onChange={(e) => setEditFormData({...editFormData, email: e.target.value})}
+                      className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-2">Adresse</label>
+                    <input
+                      type="text"
+                      value={editFormData.adresse}
+                      onChange={(e) => setEditFormData({...editFormData, adresse: e.target.value})}
+                      className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Arbeitsdaten */}
+              <div>
+                <h4 className="text-sm font-semibold text-slate-500 uppercase tracking-wide mb-4">
+                  Arbeitsdaten
+                </h4>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-2">Position</label>
+                    <select
+                      value={editFormData.position}
+                      onChange={(e) => setEditFormData({...editFormData, position: e.target.value})}
+                      className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+                    >
+                      <option value="Fahrer">Fahrer</option>
+                      <option value="Lagerarbeiter">Lagerarbeiter</option>
+                      <option value="Disponent">Disponent</option>
+                      <option value="Verwaltung">Verwaltung</option>
+                      <option value="Geschäftsführer">Geschäftsführer</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-2">Grundgehalt (€)</label>
+                    <input
+                      type="number"
+                      step="0.01"
+                      value={editFormData.grundgehalt}
+                      onChange={(e) => setEditFormData({...editFormData, grundgehalt: e.target.value})}
+                      className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Notizen */}
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-2">Notizen</label>
+                <textarea
+                  value={editFormData.notizen}
+                  onChange={(e) => setEditFormData({...editFormData, notizen: e.target.value})}
+                  rows={3}
+                  className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+                />
+              </div>
+
+              {/* Buttons */}
+              <div className="flex gap-3 pt-4">
+                <button
+                  type="button"
+                  onClick={() => setShowEditModal(false)}
+                  className="flex-1 px-6 py-3 border border-slate-200 text-slate-700 rounded-xl font-semibold hover:bg-slate-50 transition-colors"
+                >
+                  Abbrechen
+                </button>
+                <button
+                  type="submit"
+                  disabled={saving}
+                  className="flex-1 px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-xl font-semibold hover:from-blue-700 hover:to-blue-800 transition-all disabled:opacity-50"
+                >
+                  {saving ? 'Speichern...' : 'Änderungen speichern'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
 
       {/* Modal */}
       {showModal && (
