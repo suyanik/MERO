@@ -6,6 +6,7 @@ import { Mitarbeiter } from '@/types/database'
 import Zahlungen from '@/components/Zahlungen'
 import Dokumente from '@/components/Dokumente'
 import UrlaubComponent from '@/components/Urlaub'
+import Dashboard from '@/components/Dashboard'
 import {
   Users,
   CreditCard,
@@ -20,13 +21,14 @@ import {
   Menu,
   X,
   ChevronRight,
-  Euro
+  Euro,
+  LayoutDashboard
 } from 'lucide-react'
 
 export default function Home() {
   const [mitarbeiter, setMitarbeiter] = useState<Mitarbeiter[]>([])
   const [loading, setLoading] = useState(true)
-  const [activeTab, setActiveTab] = useState('mitarbeiter')
+  const [activeTab, setActiveTab] = useState('dashboard')
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [searchTerm, setSearchTerm] = useState('')
   const [showModal, setShowModal] = useState(false)
@@ -182,6 +184,7 @@ export default function Home() {
   )
 
   const menuItems = [
+    { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard, count: null },
     { id: 'mitarbeiter', label: 'Mitarbeiter', icon: Users, count: mitarbeiter.length },
     { id: 'zahlungen', label: 'Zahlungen', icon: CreditCard, count: 0 },
     { id: 'dokumente', label: 'Dokumente', icon: FileText, count: 0 },
@@ -245,13 +248,15 @@ export default function Home() {
                   <item.icon size={20} />
                   <span className="font-medium">{item.label}</span>
                 </div>
-                <span className={`text-sm px-2 py-1 rounded-lg ${
-                  activeTab === item.id
-                    ? 'bg-white/20'
-                    : 'bg-slate-800 group-hover:bg-slate-700'
-                }`}>
-                  {item.count}
-                </span>
+                {item.count !== null && (
+                  <span className={`text-sm px-2 py-1 rounded-lg ${
+                    activeTab === item.id
+                      ? 'bg-white/20'
+                      : 'bg-slate-800 group-hover:bg-slate-700'
+                  }`}>
+                    {item.count}
+                  </span>
+                )}
               </button>
             ))}
           </nav>
@@ -290,9 +295,11 @@ export default function Home() {
                       <item.icon size={20} />
                       <span className="font-medium">{item.label}</span>
                     </div>
-                    <span className="text-sm px-2 py-1 rounded-lg bg-slate-800">
-                      {item.count}
-                    </span>
+                    {item.count !== null && (
+                      <span className="text-sm px-2 py-1 rounded-lg bg-slate-800">
+                        {item.count}
+                      </span>
+                    )}
                   </button>
                 ))}
               </nav>
@@ -302,6 +309,29 @@ export default function Home() {
 
         {/* Main Content */}
         <main className="flex-1 lg:ml-72 p-4 lg:p-8">
+          {/* Dashboard Tab */}
+          {activeTab === 'dashboard' && (
+            <Dashboard mitarbeiter={mitarbeiter} onNavigate={setActiveTab} />
+          )}
+
+          {/* Zahlungen Tab */}
+          {activeTab === 'zahlungen' && (
+            <Zahlungen mitarbeiter={mitarbeiter} onUpdate={fetchMitarbeiter} />
+          )}
+
+          {/* Urlaub Tab */}
+          {activeTab === 'urlaub' && (
+            <UrlaubComponent mitarbeiter={mitarbeiter} onUpdate={fetchMitarbeiter} />
+          )}
+
+          {/* Dokumente Tab */}
+          {activeTab === 'dokumente' && (
+            <Dokumente mitarbeiter={mitarbeiter} onUpdate={fetchMitarbeiter} />
+          )}
+
+          {/* Mitarbeiter Tab */}
+          {activeTab === 'mitarbeiter' && (
+          <>
           {/* Page Header */}
           <div className="mb-8">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
@@ -386,24 +416,6 @@ export default function Home() {
             </div>
           </div>
 
-          {/* Zahlungen Tab */}
-          {activeTab === 'zahlungen' && (
-            <Zahlungen mitarbeiter={mitarbeiter} onUpdate={fetchMitarbeiter} />
-          )}
-
-          {/* Urlaub Tab */}
-          {activeTab === 'urlaub' && (
-            <UrlaubComponent mitarbeiter={mitarbeiter} onUpdate={fetchMitarbeiter} />
-          )}
-
-          {/* Dokumente Tab */}
-          {activeTab === 'dokumente' && (
-            <Dokumente mitarbeiter={mitarbeiter} onUpdate={fetchMitarbeiter} />
-          )}
-
-          {/* Mitarbeiter Tab */}
-          {activeTab === 'mitarbeiter' && (
-          <>
           {/* Employee Cards - Mobile */}
           <div className="lg:hidden space-y-4">
             {filteredMitarbeiter.map((m) => (
