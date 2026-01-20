@@ -146,11 +146,9 @@ export default function Home() {
       nov: formData.gehalt_nov ? parseFloat(formData.gehalt_nov) : grundgehalt,
       dez: formData.gehalt_dez ? parseFloat(formData.gehalt_dez) : grundgehalt,
     }
-    const monatlicheGehaelter = {
-      [formSelectedYear]: yearData
-    }
 
-    const { error } = await supabase
+    // First insert mitarbeiter
+    const { data: mitarbeiterData, error: mitarbeiterError } = await supabase
       .from('mitarbeiter')
       .insert([{
         vorname: formData.vorname,
@@ -161,60 +159,88 @@ export default function Home() {
         adresse: formData.adresse || null,
         position: formData.position,
         grundgehalt: grundgehalt,
-        monatliches_gehalt: monatlicheGehaelter,
         notizen: formData.notizen || null
       }])
+      .select()
 
-    if (error) {
-      alert('Fehler beim Speichern: ' + error.message)
-    } else {
-      setShowModal(false)
-      setFormSelectedYear(currentYear)
-      setFormData({
-        vorname: '',
-        nachname: '',
-        geburtsdatum: '',
-        telefon: '',
-        email: '',
-        adresse: '',
-        position: 'Fahrer',
-        grundgehalt: '',
-        gehalt_jan: '',
-        gehalt_feb: '',
-        gehalt_mar: '',
-        gehalt_apr: '',
-        gehalt_mai: '',
-        gehalt_jun: '',
-        gehalt_jul: '',
-        gehalt_aug: '',
-        gehalt_sep: '',
-        gehalt_okt: '',
-        gehalt_nov: '',
-        gehalt_dez: '',
-        notizen: ''
-      })
-      fetchMitarbeiter()
+    if (mitarbeiterError) {
+      alert('Fehler beim Speichern: ' + mitarbeiterError.message)
+      setSaving(false)
+      return
     }
+
+    // Then insert monatliches_gehalt with the new mitarbeiter_id
+    if (mitarbeiterData && mitarbeiterData[0]) {
+      const { error: gehaltError } = await supabase
+        .from('monatliches_gehalt')
+        .insert([{
+          mitarbeiter_id: mitarbeiterData[0].id,
+          jahr: formSelectedYear,
+          jan: yearData.jan,
+          feb: yearData.feb,
+          mar: yearData.mar,
+          apr: yearData.apr,
+          mai: yearData.mai,
+          jun: yearData.jun,
+          jul: yearData.jul,
+          aug: yearData.aug,
+          sep: yearData.sep,
+          okt: yearData.okt,
+          nov: yearData.nov,
+          dez: yearData.dez
+        }])
+
+      if (gehaltError) {
+        console.error('Fehler beim Speichern der Gehaltsdaten:', gehaltError.message)
+      }
+    }
+
+    setShowModal(false)
+    setFormSelectedYear(currentYear)
+    setFormData({
+      vorname: '',
+      nachname: '',
+      geburtsdatum: '',
+      telefon: '',
+      email: '',
+      adresse: '',
+      position: 'Fahrer',
+      grundgehalt: '',
+      gehalt_jan: '',
+      gehalt_feb: '',
+      gehalt_mar: '',
+      gehalt_apr: '',
+      gehalt_mai: '',
+      gehalt_jun: '',
+      gehalt_jul: '',
+      gehalt_aug: '',
+      gehalt_sep: '',
+      gehalt_okt: '',
+      gehalt_nov: '',
+      gehalt_dez: '',
+      notizen: ''
+    })
+    fetchMitarbeiter()
     setSaving(false)
   }
 
-  function getYearData(mg: any, year: number) {
-    // Check if data is in new year-based format or old flat format
-    if (mg && mg[year]) {
-      return mg[year]
-    }
-    // Fallback for old flat format (backward compatibility)
-    if (mg && mg.jan !== undefined) {
-      return mg
-    }
-    return {}
+  async function fetchMonatlichesGehalt(mitarbeiterId: string, year: number) {
+    const { data } = await supabase
+      .from('monatliches_gehalt')
+      .select('*')
+      .eq('mitarbeiter_id', mitarbeiterId)
+      .eq('jahr', year)
+      .single()
+    return data
   }
 
-  function openEditModal(m: Mitarbeiter) {
+  async function openEditModal(m: Mitarbeiter) {
     setEditingMitarbeiter(m)
-    const mg = m.monatliches_gehalt as any
     setEditSelectedYear(currentYear)
-    const yearData = getYearData(mg, currentYear)
+
+    // Fetch salary data from monatliches_gehalt table
+    const yearData = await fetchMonatlichesGehalt(m.id, currentYear)
+
     setEditFormData({
       vorname: m.vorname,
       nachname: m.nachname,
@@ -242,11 +268,13 @@ export default function Home() {
     setShowEditModal(true)
   }
 
-  function handleEditYearChange(year: number) {
+  async function handleEditYearChange(year: number) {
     if (!editingMitarbeiter) return
     setEditSelectedYear(year)
-    const mg = editingMitarbeiter.monatliches_gehalt as any
-    const yearData = getYearData(mg, year)
+
+    // Fetch salary data from monatliches_gehalt table
+    const yearData = await fetchMonatlichesGehalt(editingMitarbeiter.id, year)
+
     setEditFormData(prev => ({
       ...prev,
       gehalt_jan: yearData?.jan?.toString() || '',
@@ -285,14 +313,8 @@ export default function Home() {
       dez: editFormData.gehalt_dez ? parseFloat(editFormData.gehalt_dez) : grundgehalt,
     }
 
-    // Preserve existing years and update selected year
-    const existingData = editingMitarbeiter.monatliches_gehalt as any || {}
-    const monatlicheGehaelter = {
-      ...existingData,
-      [editSelectedYear]: yearData
-    }
-
-    const { error } = await supabase
+    // Update mitarbeiter data
+    const { error: mitarbeiterError } = await supabase
       .from('mitarbeiter')
       .update({
         vorname: editFormData.vorname,
@@ -303,20 +325,45 @@ export default function Home() {
         adresse: editFormData.adresse || null,
         position: editFormData.position,
         grundgehalt: grundgehalt,
-        monatliches_gehalt: monatlicheGehaelter,
         notizen: editFormData.notizen || null,
         aktiv: editFormData.aktiv
       })
       .eq('id', editingMitarbeiter.id)
 
-    if (error) {
-      alert('Fehler beim Speichern: ' + error.message)
-    } else {
-      setShowEditModal(false)
-      setEditingMitarbeiter(null)
-      setEditSelectedYear(currentYear)
-      fetchMitarbeiter()
+    if (mitarbeiterError) {
+      alert('Fehler beim Speichern: ' + mitarbeiterError.message)
+      setSaving(false)
+      return
     }
+
+    // Upsert monatliches_gehalt (insert or update for the selected year)
+    const { error: gehaltError } = await supabase
+      .from('monatliches_gehalt')
+      .upsert([{
+        mitarbeiter_id: editingMitarbeiter.id,
+        jahr: editSelectedYear,
+        jan: yearData.jan,
+        feb: yearData.feb,
+        mar: yearData.mar,
+        apr: yearData.apr,
+        mai: yearData.mai,
+        jun: yearData.jun,
+        jul: yearData.jul,
+        aug: yearData.aug,
+        sep: yearData.sep,
+        okt: yearData.okt,
+        nov: yearData.nov,
+        dez: yearData.dez
+      }], { onConflict: 'mitarbeiter_id,jahr' })
+
+    if (gehaltError) {
+      console.error('Fehler beim Speichern der Gehaltsdaten:', gehaltError.message)
+    }
+
+    setShowEditModal(false)
+    setEditingMitarbeiter(null)
+    setEditSelectedYear(currentYear)
+    fetchMitarbeiter()
     setSaving(false)
   }
 
