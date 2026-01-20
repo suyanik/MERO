@@ -10,6 +10,7 @@ export interface Mitarbeiter {
   position: string
   eintrittsdatum: string
   grundgehalt: number
+  monatliches_gehalt: number | null
   aktiv: boolean
   notizen: string | null
 }
@@ -45,5 +46,15 @@ export interface Urlaub {
   enddatum: string
   gesamttage: number | null
   status: 'ausstehend' | 'genehmigt' | 'abgelehnt'
+  notizen: string | null
+}
+
+export interface MonatlichesGehalt {
+  id: string
+  erstellt_am: string
+  mitarbeiter_id: string
+  jahr: number
+  monat: number
+  betrag: number
   notizen: string | null
 }

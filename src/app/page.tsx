@@ -45,6 +45,7 @@ export default function Home() {
     adresse: '',
     position: 'Fahrer',
     grundgehalt: '',
+    monatliches_gehalt: '',
     notizen: ''
   })
   const [saving, setSaving] = useState(false)
@@ -60,6 +61,7 @@ export default function Home() {
     adresse: '',
     position: 'Fahrer',
     grundgehalt: '',
+    monatliches_gehalt: '',
     notizen: '',
     aktiv: true
   })
@@ -114,6 +116,7 @@ export default function Home() {
         adresse: formData.adresse || null,
         position: formData.position,
         grundgehalt: parseFloat(formData.grundgehalt) || 0,
+        monatliches_gehalt: formData.monatliches_gehalt ? parseFloat(formData.monatliches_gehalt) : null,
         notizen: formData.notizen || null
       }])
 
@@ -130,6 +133,7 @@ export default function Home() {
         adresse: '',
         position: 'Fahrer',
         grundgehalt: '',
+        monatliches_gehalt: '',
         notizen: ''
       })
       fetchMitarbeiter()
@@ -148,6 +152,7 @@ export default function Home() {
       adresse: m.adresse || '',
       position: m.position,
       grundgehalt: m.grundgehalt.toString(),
+      monatliches_gehalt: m.monatliches_gehalt?.toString() || '',
       notizen: m.notizen || '',
       aktiv: m.aktiv
     })
@@ -170,6 +175,7 @@ export default function Home() {
         adresse: editFormData.adresse || null,
         position: editFormData.position,
         grundgehalt: parseFloat(editFormData.grundgehalt) || 0,
+        monatliches_gehalt: editFormData.monatliches_gehalt ? parseFloat(editFormData.monatliches_gehalt) : null,
         notizen: editFormData.notizen || null,
         aktiv: editFormData.aktiv
       })
@@ -762,6 +768,16 @@ export default function Home() {
                       className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-slate-900 placeholder-slate-400"
                     />
                   </div>
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-2">Monatliches Gehalt (€)</label>
+                    <input
+                      type="number"
+                      step="0.01"
+                      value={editFormData.monatliches_gehalt}
+                      onChange={(e) => setEditFormData({...editFormData, monatliches_gehalt: e.target.value})}
+                      className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-slate-900 placeholder-slate-400"
+                    />
+                  </div>
                 </div>
               </div>
 
@@ -932,6 +948,19 @@ export default function Home() {
                       step="0.01"
                       value={formData.grundgehalt}
                       onChange={(e) => setFormData({...formData, grundgehalt: e.target.value})}
+                      className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white text-slate-900 placeholder-slate-400"
+                      placeholder="3500.00"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-2">
+                      Monatliches Gehalt (€)
+                    </label>
+                    <input
+                      type="number"
+                      step="0.01"
+                      value={formData.monatliches_gehalt}
+                      onChange={(e) => setFormData({...formData, monatliches_gehalt: e.target.value})}
                       className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white text-slate-900 placeholder-slate-400"
                       placeholder="3500.00"
                     />
