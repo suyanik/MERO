@@ -63,6 +63,10 @@ export default function Home() {
   const [editingMitarbeiter, setEditingMitarbeiter] = useState<Mitarbeiter | null>(null)
   const [showEditModal, setShowEditModal] = useState(false)
   const [selectedMitarbeiter, setSelectedMitarbeiter] = useState<Mitarbeiter | null>(null)
+  const currentYear = new Date().getFullYear()
+  const [formSelectedYear, setFormSelectedYear] = useState(currentYear)
+  const [editSelectedYear, setEditSelectedYear] = useState(currentYear)
+  const availableYears = [2024, 2025, 2026, 2027, 2028]
   const [editFormData, setEditFormData] = useState({
     vorname: '',
     nachname: '',
@@ -128,7 +132,7 @@ export default function Home() {
     setSaving(true)
 
     const grundgehalt = parseFloat(formData.grundgehalt) || 0
-    const monatlicheGehaelter = {
+    const yearData = {
       jan: formData.gehalt_jan ? parseFloat(formData.gehalt_jan) : grundgehalt,
       feb: formData.gehalt_feb ? parseFloat(formData.gehalt_feb) : grundgehalt,
       mar: formData.gehalt_mar ? parseFloat(formData.gehalt_mar) : grundgehalt,
@@ -141,6 +145,9 @@ export default function Home() {
       okt: formData.gehalt_okt ? parseFloat(formData.gehalt_okt) : grundgehalt,
       nov: formData.gehalt_nov ? parseFloat(formData.gehalt_nov) : grundgehalt,
       dez: formData.gehalt_dez ? parseFloat(formData.gehalt_dez) : grundgehalt,
+    }
+    const monatlicheGehaelter = {
+      [formSelectedYear]: yearData
     }
 
     const { error } = await supabase
@@ -162,6 +169,7 @@ export default function Home() {
       alert('Fehler beim Speichern: ' + error.message)
     } else {
       setShowModal(false)
+      setFormSelectedYear(currentYear)
       setFormData({
         vorname: '',
         nachname: '',
@@ -190,9 +198,23 @@ export default function Home() {
     setSaving(false)
   }
 
+  function getYearData(mg: any, year: number) {
+    // Check if data is in new year-based format or old flat format
+    if (mg && mg[year]) {
+      return mg[year]
+    }
+    // Fallback for old flat format (backward compatibility)
+    if (mg && mg.jan !== undefined) {
+      return mg
+    }
+    return {}
+  }
+
   function openEditModal(m: Mitarbeiter) {
     setEditingMitarbeiter(m)
     const mg = m.monatliches_gehalt as any
+    setEditSelectedYear(currentYear)
+    const yearData = getYearData(mg, currentYear)
     setEditFormData({
       vorname: m.vorname,
       nachname: m.nachname,
@@ -202,22 +224,44 @@ export default function Home() {
       adresse: m.adresse || '',
       position: m.position,
       grundgehalt: m.grundgehalt.toString(),
-      gehalt_jan: mg?.jan?.toString() || '',
-      gehalt_feb: mg?.feb?.toString() || '',
-      gehalt_mar: mg?.mar?.toString() || '',
-      gehalt_apr: mg?.apr?.toString() || '',
-      gehalt_mai: mg?.mai?.toString() || '',
-      gehalt_jun: mg?.jun?.toString() || '',
-      gehalt_jul: mg?.jul?.toString() || '',
-      gehalt_aug: mg?.aug?.toString() || '',
-      gehalt_sep: mg?.sep?.toString() || '',
-      gehalt_okt: mg?.okt?.toString() || '',
-      gehalt_nov: mg?.nov?.toString() || '',
-      gehalt_dez: mg?.dez?.toString() || '',
+      gehalt_jan: yearData?.jan?.toString() || '',
+      gehalt_feb: yearData?.feb?.toString() || '',
+      gehalt_mar: yearData?.mar?.toString() || '',
+      gehalt_apr: yearData?.apr?.toString() || '',
+      gehalt_mai: yearData?.mai?.toString() || '',
+      gehalt_jun: yearData?.jun?.toString() || '',
+      gehalt_jul: yearData?.jul?.toString() || '',
+      gehalt_aug: yearData?.aug?.toString() || '',
+      gehalt_sep: yearData?.sep?.toString() || '',
+      gehalt_okt: yearData?.okt?.toString() || '',
+      gehalt_nov: yearData?.nov?.toString() || '',
+      gehalt_dez: yearData?.dez?.toString() || '',
       notizen: m.notizen || '',
       aktiv: m.aktiv
     })
     setShowEditModal(true)
+  }
+
+  function handleEditYearChange(year: number) {
+    if (!editingMitarbeiter) return
+    setEditSelectedYear(year)
+    const mg = editingMitarbeiter.monatliches_gehalt as any
+    const yearData = getYearData(mg, year)
+    setEditFormData(prev => ({
+      ...prev,
+      gehalt_jan: yearData?.jan?.toString() || '',
+      gehalt_feb: yearData?.feb?.toString() || '',
+      gehalt_mar: yearData?.mar?.toString() || '',
+      gehalt_apr: yearData?.apr?.toString() || '',
+      gehalt_mai: yearData?.mai?.toString() || '',
+      gehalt_jun: yearData?.jun?.toString() || '',
+      gehalt_jul: yearData?.jul?.toString() || '',
+      gehalt_aug: yearData?.aug?.toString() || '',
+      gehalt_sep: yearData?.sep?.toString() || '',
+      gehalt_okt: yearData?.okt?.toString() || '',
+      gehalt_nov: yearData?.nov?.toString() || '',
+      gehalt_dez: yearData?.dez?.toString() || '',
+    }))
   }
 
   async function handleEditSubmit(e: React.FormEvent) {
@@ -226,7 +270,7 @@ export default function Home() {
     setSaving(true)
 
     const grundgehalt = parseFloat(editFormData.grundgehalt) || 0
-    const monatlicheGehaelter = {
+    const yearData = {
       jan: editFormData.gehalt_jan ? parseFloat(editFormData.gehalt_jan) : grundgehalt,
       feb: editFormData.gehalt_feb ? parseFloat(editFormData.gehalt_feb) : grundgehalt,
       mar: editFormData.gehalt_mar ? parseFloat(editFormData.gehalt_mar) : grundgehalt,
@@ -239,6 +283,13 @@ export default function Home() {
       okt: editFormData.gehalt_okt ? parseFloat(editFormData.gehalt_okt) : grundgehalt,
       nov: editFormData.gehalt_nov ? parseFloat(editFormData.gehalt_nov) : grundgehalt,
       dez: editFormData.gehalt_dez ? parseFloat(editFormData.gehalt_dez) : grundgehalt,
+    }
+
+    // Preserve existing years and update selected year
+    const existingData = editingMitarbeiter.monatliches_gehalt as any || {}
+    const monatlicheGehaelter = {
+      ...existingData,
+      [editSelectedYear]: yearData
     }
 
     const { error } = await supabase
@@ -263,6 +314,7 @@ export default function Home() {
     } else {
       setShowEditModal(false)
       setEditingMitarbeiter(null)
+      setEditSelectedYear(currentYear)
       fetchMitarbeiter()
     }
     setSaving(false)
@@ -850,9 +902,20 @@ export default function Home() {
 
               {/* Monatliche Gehälter */}
               <div>
-                <h4 className="text-sm font-semibold text-slate-500 uppercase tracking-wide mb-4">
-                  Monatliche Gehälter (€) - Leer = Grundgehalt
-                </h4>
+                <div className="flex items-center justify-between mb-4">
+                  <h4 className="text-sm font-semibold text-slate-500 uppercase tracking-wide">
+                    Monatliche Gehälter (€) - Leer = Grundgehalt
+                  </h4>
+                  <select
+                    value={editSelectedYear}
+                    onChange={(e) => handleEditYearChange(parseInt(e.target.value))}
+                    className="px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-slate-900 text-sm font-medium"
+                  >
+                    {availableYears.map(year => (
+                      <option key={year} value={year}>{year}</option>
+                    ))}
+                  </select>
+                </div>
                 <div className="grid grid-cols-3 gap-3">
                   <div>
                     <label className="block text-xs font-medium text-slate-600 mb-1">Jan</label>
@@ -1165,9 +1228,20 @@ export default function Home() {
 
               {/* Monatliche Gehälter */}
               <div>
-                <h4 className="text-sm font-semibold text-slate-500 uppercase tracking-wide mb-4">
-                  Monatliche Gehälter (€) - Leer = Grundgehalt
-                </h4>
+                <div className="flex items-center justify-between mb-4">
+                  <h4 className="text-sm font-semibold text-slate-500 uppercase tracking-wide">
+                    Monatliche Gehälter (€) - Leer = Grundgehalt
+                  </h4>
+                  <select
+                    value={formSelectedYear}
+                    onChange={(e) => setFormSelectedYear(parseInt(e.target.value))}
+                    className="px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-slate-900 text-sm font-medium"
+                  >
+                    {availableYears.map(year => (
+                      <option key={year} value={year}>{year}</option>
+                    ))}
+                  </select>
+                </div>
                 <div className="grid grid-cols-3 gap-3">
                   <div>
                     <label className="block text-xs font-medium text-slate-600 mb-1">Jan</label>
