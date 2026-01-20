@@ -45,7 +45,18 @@ export default function Home() {
     adresse: '',
     position: 'Fahrer',
     grundgehalt: '',
-    monatliches_gehalt: '',
+    gehalt_jan: '',
+    gehalt_feb: '',
+    gehalt_mar: '',
+    gehalt_apr: '',
+    gehalt_mai: '',
+    gehalt_jun: '',
+    gehalt_jul: '',
+    gehalt_aug: '',
+    gehalt_sep: '',
+    gehalt_okt: '',
+    gehalt_nov: '',
+    gehalt_dez: '',
     notizen: ''
   })
   const [saving, setSaving] = useState(false)
@@ -61,7 +72,18 @@ export default function Home() {
     adresse: '',
     position: 'Fahrer',
     grundgehalt: '',
-    monatliches_gehalt: '',
+    gehalt_jan: '',
+    gehalt_feb: '',
+    gehalt_mar: '',
+    gehalt_apr: '',
+    gehalt_mai: '',
+    gehalt_jun: '',
+    gehalt_jul: '',
+    gehalt_aug: '',
+    gehalt_sep: '',
+    gehalt_okt: '',
+    gehalt_nov: '',
+    gehalt_dez: '',
     notizen: '',
     aktiv: true
   })
@@ -105,6 +127,22 @@ export default function Home() {
     e.preventDefault()
     setSaving(true)
 
+    const grundgehalt = parseFloat(formData.grundgehalt) || 0
+    const monatlicheGehaelter = {
+      jan: formData.gehalt_jan ? parseFloat(formData.gehalt_jan) : grundgehalt,
+      feb: formData.gehalt_feb ? parseFloat(formData.gehalt_feb) : grundgehalt,
+      mar: formData.gehalt_mar ? parseFloat(formData.gehalt_mar) : grundgehalt,
+      apr: formData.gehalt_apr ? parseFloat(formData.gehalt_apr) : grundgehalt,
+      mai: formData.gehalt_mai ? parseFloat(formData.gehalt_mai) : grundgehalt,
+      jun: formData.gehalt_jun ? parseFloat(formData.gehalt_jun) : grundgehalt,
+      jul: formData.gehalt_jul ? parseFloat(formData.gehalt_jul) : grundgehalt,
+      aug: formData.gehalt_aug ? parseFloat(formData.gehalt_aug) : grundgehalt,
+      sep: formData.gehalt_sep ? parseFloat(formData.gehalt_sep) : grundgehalt,
+      okt: formData.gehalt_okt ? parseFloat(formData.gehalt_okt) : grundgehalt,
+      nov: formData.gehalt_nov ? parseFloat(formData.gehalt_nov) : grundgehalt,
+      dez: formData.gehalt_dez ? parseFloat(formData.gehalt_dez) : grundgehalt,
+    }
+
     const { error } = await supabase
       .from('mitarbeiter')
       .insert([{
@@ -115,8 +153,8 @@ export default function Home() {
         email: formData.email || null,
         adresse: formData.adresse || null,
         position: formData.position,
-        grundgehalt: parseFloat(formData.grundgehalt) || 0,
-        monatliches_gehalt: formData.monatliches_gehalt ? parseFloat(formData.monatliches_gehalt) : null,
+        grundgehalt: grundgehalt,
+        monatliches_gehalt: monatlicheGehaelter,
         notizen: formData.notizen || null
       }])
 
@@ -133,7 +171,18 @@ export default function Home() {
         adresse: '',
         position: 'Fahrer',
         grundgehalt: '',
-        monatliches_gehalt: '',
+        gehalt_jan: '',
+        gehalt_feb: '',
+        gehalt_mar: '',
+        gehalt_apr: '',
+        gehalt_mai: '',
+        gehalt_jun: '',
+        gehalt_jul: '',
+        gehalt_aug: '',
+        gehalt_sep: '',
+        gehalt_okt: '',
+        gehalt_nov: '',
+        gehalt_dez: '',
         notizen: ''
       })
       fetchMitarbeiter()
@@ -143,6 +192,7 @@ export default function Home() {
 
   function openEditModal(m: Mitarbeiter) {
     setEditingMitarbeiter(m)
+    const mg = m.monatliches_gehalt as any
     setEditFormData({
       vorname: m.vorname,
       nachname: m.nachname,
@@ -152,7 +202,18 @@ export default function Home() {
       adresse: m.adresse || '',
       position: m.position,
       grundgehalt: m.grundgehalt.toString(),
-      monatliches_gehalt: m.monatliches_gehalt?.toString() || '',
+      gehalt_jan: mg?.jan?.toString() || '',
+      gehalt_feb: mg?.feb?.toString() || '',
+      gehalt_mar: mg?.mar?.toString() || '',
+      gehalt_apr: mg?.apr?.toString() || '',
+      gehalt_mai: mg?.mai?.toString() || '',
+      gehalt_jun: mg?.jun?.toString() || '',
+      gehalt_jul: mg?.jul?.toString() || '',
+      gehalt_aug: mg?.aug?.toString() || '',
+      gehalt_sep: mg?.sep?.toString() || '',
+      gehalt_okt: mg?.okt?.toString() || '',
+      gehalt_nov: mg?.nov?.toString() || '',
+      gehalt_dez: mg?.dez?.toString() || '',
       notizen: m.notizen || '',
       aktiv: m.aktiv
     })
@@ -164,6 +225,22 @@ export default function Home() {
     if (!editingMitarbeiter) return
     setSaving(true)
 
+    const grundgehalt = parseFloat(editFormData.grundgehalt) || 0
+    const monatlicheGehaelter = {
+      jan: editFormData.gehalt_jan ? parseFloat(editFormData.gehalt_jan) : grundgehalt,
+      feb: editFormData.gehalt_feb ? parseFloat(editFormData.gehalt_feb) : grundgehalt,
+      mar: editFormData.gehalt_mar ? parseFloat(editFormData.gehalt_mar) : grundgehalt,
+      apr: editFormData.gehalt_apr ? parseFloat(editFormData.gehalt_apr) : grundgehalt,
+      mai: editFormData.gehalt_mai ? parseFloat(editFormData.gehalt_mai) : grundgehalt,
+      jun: editFormData.gehalt_jun ? parseFloat(editFormData.gehalt_jun) : grundgehalt,
+      jul: editFormData.gehalt_jul ? parseFloat(editFormData.gehalt_jul) : grundgehalt,
+      aug: editFormData.gehalt_aug ? parseFloat(editFormData.gehalt_aug) : grundgehalt,
+      sep: editFormData.gehalt_sep ? parseFloat(editFormData.gehalt_sep) : grundgehalt,
+      okt: editFormData.gehalt_okt ? parseFloat(editFormData.gehalt_okt) : grundgehalt,
+      nov: editFormData.gehalt_nov ? parseFloat(editFormData.gehalt_nov) : grundgehalt,
+      dez: editFormData.gehalt_dez ? parseFloat(editFormData.gehalt_dez) : grundgehalt,
+    }
+
     const { error } = await supabase
       .from('mitarbeiter')
       .update({
@@ -174,8 +251,8 @@ export default function Home() {
         email: editFormData.email || null,
         adresse: editFormData.adresse || null,
         position: editFormData.position,
-        grundgehalt: parseFloat(editFormData.grundgehalt) || 0,
-        monatliches_gehalt: editFormData.monatliches_gehalt ? parseFloat(editFormData.monatliches_gehalt) : null,
+        grundgehalt: grundgehalt,
+        monatliches_gehalt: monatlicheGehaelter,
         notizen: editFormData.notizen || null,
         aktiv: editFormData.aktiv
       })
@@ -768,14 +845,145 @@ export default function Home() {
                       className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-slate-900 placeholder-slate-400"
                     />
                   </div>
+                </div>
+              </div>
+
+              {/* Monatliche Gehälter */}
+              <div>
+                <h4 className="text-sm font-semibold text-slate-500 uppercase tracking-wide mb-4">
+                  Monatliche Gehälter (€) - Leer = Grundgehalt
+                </h4>
+                <div className="grid grid-cols-3 gap-3">
                   <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-2">Monatliches Gehalt (€)</label>
+                    <label className="block text-xs font-medium text-slate-600 mb-1">Jan</label>
                     <input
                       type="number"
                       step="0.01"
-                      value={editFormData.monatliches_gehalt}
-                      onChange={(e) => setEditFormData({...editFormData, monatliches_gehalt: e.target.value})}
-                      className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-slate-900 placeholder-slate-400"
+                      value={editFormData.gehalt_jan}
+                      onChange={(e) => setEditFormData({...editFormData, gehalt_jan: e.target.value})}
+                      placeholder={editFormData.grundgehalt || '0'}
+                      className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-slate-900 placeholder-slate-300 text-sm"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-slate-600 mb-1">Feb</label>
+                    <input
+                      type="number"
+                      step="0.01"
+                      value={editFormData.gehalt_feb}
+                      onChange={(e) => setEditFormData({...editFormData, gehalt_feb: e.target.value})}
+                      placeholder={editFormData.grundgehalt || '0'}
+                      className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-slate-900 placeholder-slate-300 text-sm"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-slate-600 mb-1">Mär</label>
+                    <input
+                      type="number"
+                      step="0.01"
+                      value={editFormData.gehalt_mar}
+                      onChange={(e) => setEditFormData({...editFormData, gehalt_mar: e.target.value})}
+                      placeholder={editFormData.grundgehalt || '0'}
+                      className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-slate-900 placeholder-slate-300 text-sm"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-slate-600 mb-1">Apr</label>
+                    <input
+                      type="number"
+                      step="0.01"
+                      value={editFormData.gehalt_apr}
+                      onChange={(e) => setEditFormData({...editFormData, gehalt_apr: e.target.value})}
+                      placeholder={editFormData.grundgehalt || '0'}
+                      className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-slate-900 placeholder-slate-300 text-sm"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-slate-600 mb-1">Mai</label>
+                    <input
+                      type="number"
+                      step="0.01"
+                      value={editFormData.gehalt_mai}
+                      onChange={(e) => setEditFormData({...editFormData, gehalt_mai: e.target.value})}
+                      placeholder={editFormData.grundgehalt || '0'}
+                      className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-slate-900 placeholder-slate-300 text-sm"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-slate-600 mb-1">Jun</label>
+                    <input
+                      type="number"
+                      step="0.01"
+                      value={editFormData.gehalt_jun}
+                      onChange={(e) => setEditFormData({...editFormData, gehalt_jun: e.target.value})}
+                      placeholder={editFormData.grundgehalt || '0'}
+                      className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-slate-900 placeholder-slate-300 text-sm"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-slate-600 mb-1">Jul</label>
+                    <input
+                      type="number"
+                      step="0.01"
+                      value={editFormData.gehalt_jul}
+                      onChange={(e) => setEditFormData({...editFormData, gehalt_jul: e.target.value})}
+                      placeholder={editFormData.grundgehalt || '0'}
+                      className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-slate-900 placeholder-slate-300 text-sm"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-slate-600 mb-1">Aug</label>
+                    <input
+                      type="number"
+                      step="0.01"
+                      value={editFormData.gehalt_aug}
+                      onChange={(e) => setEditFormData({...editFormData, gehalt_aug: e.target.value})}
+                      placeholder={editFormData.grundgehalt || '0'}
+                      className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-slate-900 placeholder-slate-300 text-sm"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-slate-600 mb-1">Sep</label>
+                    <input
+                      type="number"
+                      step="0.01"
+                      value={editFormData.gehalt_sep}
+                      onChange={(e) => setEditFormData({...editFormData, gehalt_sep: e.target.value})}
+                      placeholder={editFormData.grundgehalt || '0'}
+                      className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-slate-900 placeholder-slate-300 text-sm"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-slate-600 mb-1">Okt</label>
+                    <input
+                      type="number"
+                      step="0.01"
+                      value={editFormData.gehalt_okt}
+                      onChange={(e) => setEditFormData({...editFormData, gehalt_okt: e.target.value})}
+                      placeholder={editFormData.grundgehalt || '0'}
+                      className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-slate-900 placeholder-slate-300 text-sm"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-slate-600 mb-1">Nov</label>
+                    <input
+                      type="number"
+                      step="0.01"
+                      value={editFormData.gehalt_nov}
+                      onChange={(e) => setEditFormData({...editFormData, gehalt_nov: e.target.value})}
+                      placeholder={editFormData.grundgehalt || '0'}
+                      className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-slate-900 placeholder-slate-300 text-sm"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-slate-600 mb-1">Dez</label>
+                    <input
+                      type="number"
+                      step="0.01"
+                      value={editFormData.gehalt_dez}
+                      onChange={(e) => setEditFormData({...editFormData, gehalt_dez: e.target.value})}
+                      placeholder={editFormData.grundgehalt || '0'}
+                      className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-slate-900 placeholder-slate-300 text-sm"
                     />
                   </div>
                 </div>
@@ -952,17 +1160,145 @@ export default function Home() {
                       placeholder="3500.00"
                     />
                   </div>
+                </div>
+              </div>
+
+              {/* Monatliche Gehälter */}
+              <div>
+                <h4 className="text-sm font-semibold text-slate-500 uppercase tracking-wide mb-4">
+                  Monatliche Gehälter (€) - Leer = Grundgehalt
+                </h4>
+                <div className="grid grid-cols-3 gap-3">
                   <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-2">
-                      Monatliches Gehalt (€)
-                    </label>
+                    <label className="block text-xs font-medium text-slate-600 mb-1">Jan</label>
                     <input
                       type="number"
                       step="0.01"
-                      value={formData.monatliches_gehalt}
-                      onChange={(e) => setFormData({...formData, monatliches_gehalt: e.target.value})}
-                      className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white text-slate-900 placeholder-slate-400"
-                      placeholder="3500.00"
+                      value={formData.gehalt_jan}
+                      onChange={(e) => setFormData({...formData, gehalt_jan: e.target.value})}
+                      placeholder={formData.grundgehalt || '0'}
+                      className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-slate-900 placeholder-slate-300 text-sm"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-slate-600 mb-1">Feb</label>
+                    <input
+                      type="number"
+                      step="0.01"
+                      value={formData.gehalt_feb}
+                      onChange={(e) => setFormData({...formData, gehalt_feb: e.target.value})}
+                      placeholder={formData.grundgehalt || '0'}
+                      className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-slate-900 placeholder-slate-300 text-sm"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-slate-600 mb-1">Mär</label>
+                    <input
+                      type="number"
+                      step="0.01"
+                      value={formData.gehalt_mar}
+                      onChange={(e) => setFormData({...formData, gehalt_mar: e.target.value})}
+                      placeholder={formData.grundgehalt || '0'}
+                      className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-slate-900 placeholder-slate-300 text-sm"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-slate-600 mb-1">Apr</label>
+                    <input
+                      type="number"
+                      step="0.01"
+                      value={formData.gehalt_apr}
+                      onChange={(e) => setFormData({...formData, gehalt_apr: e.target.value})}
+                      placeholder={formData.grundgehalt || '0'}
+                      className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-slate-900 placeholder-slate-300 text-sm"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-slate-600 mb-1">Mai</label>
+                    <input
+                      type="number"
+                      step="0.01"
+                      value={formData.gehalt_mai}
+                      onChange={(e) => setFormData({...formData, gehalt_mai: e.target.value})}
+                      placeholder={formData.grundgehalt || '0'}
+                      className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-slate-900 placeholder-slate-300 text-sm"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-slate-600 mb-1">Jun</label>
+                    <input
+                      type="number"
+                      step="0.01"
+                      value={formData.gehalt_jun}
+                      onChange={(e) => setFormData({...formData, gehalt_jun: e.target.value})}
+                      placeholder={formData.grundgehalt || '0'}
+                      className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-slate-900 placeholder-slate-300 text-sm"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-slate-600 mb-1">Jul</label>
+                    <input
+                      type="number"
+                      step="0.01"
+                      value={formData.gehalt_jul}
+                      onChange={(e) => setFormData({...formData, gehalt_jul: e.target.value})}
+                      placeholder={formData.grundgehalt || '0'}
+                      className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-slate-900 placeholder-slate-300 text-sm"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-slate-600 mb-1">Aug</label>
+                    <input
+                      type="number"
+                      step="0.01"
+                      value={formData.gehalt_aug}
+                      onChange={(e) => setFormData({...formData, gehalt_aug: e.target.value})}
+                      placeholder={formData.grundgehalt || '0'}
+                      className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-slate-900 placeholder-slate-300 text-sm"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-slate-600 mb-1">Sep</label>
+                    <input
+                      type="number"
+                      step="0.01"
+                      value={formData.gehalt_sep}
+                      onChange={(e) => setFormData({...formData, gehalt_sep: e.target.value})}
+                      placeholder={formData.grundgehalt || '0'}
+                      className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-slate-900 placeholder-slate-300 text-sm"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-slate-600 mb-1">Okt</label>
+                    <input
+                      type="number"
+                      step="0.01"
+                      value={formData.gehalt_okt}
+                      onChange={(e) => setFormData({...formData, gehalt_okt: e.target.value})}
+                      placeholder={formData.grundgehalt || '0'}
+                      className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-slate-900 placeholder-slate-300 text-sm"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-slate-600 mb-1">Nov</label>
+                    <input
+                      type="number"
+                      step="0.01"
+                      value={formData.gehalt_nov}
+                      onChange={(e) => setFormData({...formData, gehalt_nov: e.target.value})}
+                      placeholder={formData.grundgehalt || '0'}
+                      className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-slate-900 placeholder-slate-300 text-sm"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-slate-600 mb-1">Dez</label>
+                    <input
+                      type="number"
+                      step="0.01"
+                      value={formData.gehalt_dez}
+                      onChange={(e) => setFormData({...formData, gehalt_dez: e.target.value})}
+                      placeholder={formData.grundgehalt || '0'}
+                      className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-slate-900 placeholder-slate-300 text-sm"
                     />
                   </div>
                 </div>
