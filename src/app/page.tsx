@@ -66,7 +66,7 @@ export default function Home() {
   const currentYear = new Date().getFullYear()
   const [formSelectedYear, setFormSelectedYear] = useState(currentYear)
   const [editSelectedYear, setEditSelectedYear] = useState(currentYear)
-  const availableYears = [2024, 2025, 2026, 2027, 2028]
+  const availableYears = [2026, 2027, 2028, 2029, 2030]
   const [editFormData, setEditFormData] = useState({
     vorname: '',
     nachname: '',
