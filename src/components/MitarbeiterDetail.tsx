@@ -19,7 +19,8 @@ import {
   Sun,
   Thermometer,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
+  Printer
 } from 'lucide-react'
 
 interface MitarbeiterDetailProps {
@@ -116,15 +117,65 @@ export default function MitarbeiterDetail({ mitarbeiter, onClose }: MitarbeiterD
         className="absolute inset-0 bg-black/50 backdrop-blur-sm"
         onClick={onClose}
       />
-      <div className="relative bg-slate-100 rounded-2xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden">
+      <div className="relative bg-slate-100 rounded-2xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden print-content">
+        {/* Print Styles */}
+        <style jsx global>{`
+          @media print {
+            body * {
+              visibility: hidden;
+            }
+            .print-content, .print-content * {
+              visibility: visible;
+            }
+            .print-content {
+              position: absolute;
+              left: 0;
+              top: 0;
+              width: 100%;
+              background: white !important;
+              padding: 20px !important;
+            }
+            .no-print {
+              display: none !important;
+            }
+            .print-header {
+              background: #1e40af !important;
+              -webkit-print-color-adjust: exact;
+              print-color-adjust: exact;
+            }
+            table {
+              width: 100%;
+              border-collapse: collapse;
+            }
+            th, td {
+              border: 1px solid #e2e8f0;
+              padding: 8px;
+            }
+            th {
+              background: #f1f5f9 !important;
+              -webkit-print-color-adjust: exact;
+              print-color-adjust: exact;
+            }
+          }
+        `}</style>
+
         {/* Header */}
-        <div className="bg-gradient-to-r from-blue-600 to-purple-600 p-6 text-white">
-          <button
-            onClick={onClose}
-            className="absolute top-4 right-4 p-2 hover:bg-white/20 rounded-lg transition-colors"
-          >
-            <X size={24} />
-          </button>
+        <div className="bg-gradient-to-r from-blue-600 to-purple-600 p-6 text-white print-header">
+          <div className="absolute top-4 right-4 flex items-center gap-2">
+            <button
+              onClick={() => window.print()}
+              className="p-2 hover:bg-white/20 rounded-lg transition-colors no-print"
+              title="Drucken"
+            >
+              <Printer size={24} />
+            </button>
+            <button
+              onClick={onClose}
+              className="p-2 hover:bg-white/20 rounded-lg transition-colors no-print"
+            >
+              <X size={24} />
+            </button>
+          </div>
 
           <div className="flex items-center gap-4">
             <div className="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center text-2xl font-bold">
@@ -163,14 +214,14 @@ export default function MitarbeiterDetail({ mitarbeiter, onClose }: MitarbeiterD
           <div className="flex items-center justify-center gap-4 mb-6">
             <button
               onClick={() => setSelectedYear(y => y - 1)}
-              className="p-2 hover:bg-slate-200 rounded-lg transition-colors"
+              className="p-2 hover:bg-slate-200 rounded-lg transition-colors no-print"
             >
               <ChevronLeft size={20} />
             </button>
             <span className="text-xl font-bold text-slate-900">{selectedYear}</span>
             <button
               onClick={() => setSelectedYear(y => y + 1)}
-              className="p-2 hover:bg-slate-200 rounded-lg transition-colors"
+              className="p-2 hover:bg-slate-200 rounded-lg transition-colors no-print"
             >
               <ChevronRight size={20} />
             </button>
